@@ -6,6 +6,7 @@ using Assets.Scripts.Simulation;
 using Assets.Scripts.Simulation.Utils;
 using Assets.Scripts.Models.Profile;
 using Assets.Scripts.Unity.Map;
+using Assets.Scripts.Unity.UI_New.Main;
 
 [assembly: MelonInfo(typeof(BTD6DiscordRPC.Main), "BTD6 Discord RPC", "1.0.0", "kenx00x")]
 [assembly: MelonGame("Ninja Kiwi", "BloonsTD6")]
@@ -18,26 +19,6 @@ namespace BTD6DiscordRPC
         {
             MelonLogger.Log("BTD6 Discord RPC loaded!");
             discord = new Discord.Discord(778339584408027176, (UInt64)CreateFlags.Default);
-            var activityManager = discord.GetActivityManager();
-            var activity = new Activity
-            {
-                State = $"Main menu",
-                Assets =
-                    {
-                        LargeImage = "mainimage",
-                        SmallImage = "mainimage"
-                    }
-            };
-            activityManager.UpdateActivity(activity, (res) => {
-                if (res == Result.Ok)
-                {
-                    MelonLogger.Log("Discord status updated");
-                }
-                else
-                {
-                    MelonLogger.Log("Discord status not updated");
-                }
-            });
         }
         public override void OnUpdate()
         {
@@ -122,6 +103,34 @@ namespace BTD6DiscordRPC
                 };
                 activityManager.UpdateActivity(activity, (res) =>
                 {
+                    if (res == Result.Ok)
+                    {
+                        MelonLogger.Log("Discord status updated");
+                    }
+                    else
+                    {
+                        MelonLogger.Log("Discord status not updated");
+                    }
+                });
+            }
+        }
+        [HarmonyPatch(typeof(MainMenu), "Open")]
+        public class TitleMusic_Patch
+        {
+            [HarmonyPostfix]
+            public static void Postfix()
+            {
+                var activityManager = discord.GetActivityManager();
+                var activity = new Activity
+                {
+                    State = $"Main menu",
+                    Assets =
+                    {
+                        LargeImage = "mainimage",
+                        SmallImage = "mainimage"
+                    }
+                };
+                activityManager.UpdateActivity(activity, (res) => {
                     if (res == Result.Ok)
                     {
                         MelonLogger.Log("Discord status updated");
