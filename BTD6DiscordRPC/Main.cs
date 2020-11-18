@@ -1,5 +1,4 @@
 ﻿using MelonLoader;
-using System;
 using Discord;
 using Harmony;
 using Assets.Scripts.Simulation;
@@ -41,17 +40,7 @@ namespace BTD6DiscordRPC
                         SmallImage = "mainimage"
                     }
                 };
-                activityManager.UpdateActivity(activity, (res) => 
-                {
-                    if (res == Result.Ok)
-                    {
-                        MelonLogger.Log("Discord status updated");
-                    }
-                    else
-                    {
-                        MelonLogger.Log("Discord status not updated");
-                    }
-                });
+                activityManagerFunction(activity, activityManager);
             }
         }
         [HarmonyPatch(typeof(MapSaveLoader), "LoadMapSaveData")]
@@ -71,17 +60,7 @@ namespace BTD6DiscordRPC
                         SmallImage = "mainimage"
                     }
                 };
-                activityManager.UpdateActivity(activity, (res) =>
-                {
-                    if (res == Result.Ok)
-                    {
-                        MelonLogger.Log("Discord status updated");
-                    }
-                    else
-                    {
-                        MelonLogger.Log("Discord status not updated");
-                    }
-                });
+                activityManagerFunction(activity, activityManager);
             }
         }
         [HarmonyPatch(typeof(MapLoader), "Load")]
@@ -101,17 +80,7 @@ namespace BTD6DiscordRPC
                         SmallImage = "mainimage"
                     }
                 };
-                activityManager.UpdateActivity(activity, (res) =>
-                {
-                    if (res == Result.Ok)
-                    {
-                        MelonLogger.Log("Discord status updated");
-                    }
-                    else
-                    {
-                        MelonLogger.Log("Discord status not updated");
-                    }
-                });
+                activityManagerFunction(activity, activityManager);
             }
         }
         [HarmonyPatch(typeof(MainMenu), "Open")]
@@ -130,17 +99,21 @@ namespace BTD6DiscordRPC
                         SmallImage = "mainimage"
                     }
                 };
-                activityManager.UpdateActivity(activity, (res) => {
-                    if (res == Result.Ok)
-                    {
-                        MelonLogger.Log("Discord status updated");
-                    }
-                    else
-                    {
-                        MelonLogger.Log("Discord status not updated");
-                    }
-                });
+                activityManagerFunction(activity,activityManager);
             }
+        }
+        private static void activityManagerFunction(Activity activity, ActivityManager activityManager)
+        {
+            activityManager.UpdateActivity(activity, (res) => {
+                if (res == Result.Ok)
+                {
+                    MelonLogger.Log("Discord status updated");
+                }
+                else
+                {
+                    MelonLogger.Log("Discord status not updated");
+                }
+            });
         }
     }
 }
