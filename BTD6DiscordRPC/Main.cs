@@ -18,7 +18,7 @@ namespace BTD6DiscordRPC
         public override void OnApplicationStart()
         {
             MelonLogger.Log("BTD6 Discord RPC loaded!");
-            discord = new Discord.Discord(778339584408027176, (UInt64)CreateFlags.Default);
+            discord = new Discord.Discord(778339584408027176, (ulong)CreateFlags.Default);
         }
         public override void OnUpdate()
         {
