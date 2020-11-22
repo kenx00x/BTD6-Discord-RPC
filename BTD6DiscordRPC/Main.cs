@@ -35,14 +35,14 @@ namespace BTD6DiscordRPC
                 var activity = new Activity
                 {
                     Details = "Playing",
-                    State = $"Round {currentRound-1}",
+                    State = $"Round {currentRound - 1}",
                     Assets =
                     {
                         LargeImage = "mainimage",
                         SmallImage = "mainimage"
                     }
                 };
-                activityManagerFunction(activity, activityManager);
+                ActivityManagerFunction(activity, activityManager);
             }
         }
         [HarmonyPatch(typeof(MapSaveLoader), "LoadMapSaveData")]
@@ -63,7 +63,7 @@ namespace BTD6DiscordRPC
                         SmallImage = "mainimage"
                     }
                 };
-                activityManagerFunction(activity, activityManager);
+                ActivityManagerFunction(activity, activityManager);
             }
         }
         [HarmonyPatch(typeof(MapLoader), "Load")]
@@ -84,7 +84,7 @@ namespace BTD6DiscordRPC
                         SmallImage = "mainimage"
                     }
                 };
-                activityManagerFunction(activity, activityManager);
+                ActivityManagerFunction(activity, activityManager);
             }
         }
         [HarmonyPatch(typeof(MainMenu), "Open")]
@@ -103,12 +103,12 @@ namespace BTD6DiscordRPC
                         SmallImage = "mainimage"
                     }
                 };
-                activityManagerFunction(activity, activityManager);
+                ActivityManagerFunction(activity, activityManager);
             }
         }
 
 
-        private static void activityManagerFunction(Activity activity, ActivityManager activityManager)
+        private static void ActivityManagerFunction(Activity activity, ActivityManager activityManager)
         {
             activityManager.UpdateActivity(activity, (res) =>
             {
