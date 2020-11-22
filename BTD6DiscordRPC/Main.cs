@@ -6,6 +6,7 @@ using Assets.Scripts.Unity.UI_New.Main;
 using Discord;
 using Harmony;
 using MelonLoader;
+using System.Text.RegularExpressions;
 [assembly: MelonInfo(typeof(BTD6DiscordRPC.Main), "BTD6 Discord RPC", "1.1.0", "kenx00x")]
 [assembly: MelonGame("Ninja Kiwi", "BloonsTD6")]
 namespace BTD6DiscordRPC
@@ -51,7 +52,16 @@ namespace BTD6DiscordRPC
             public static void Postfix(string map)
             {
                 currentRound = 1;
-                currentMap = map;
+                currentMap = "";
+                string[] mapSplit = Regex.Split(map, @"(?<!^)(?=[A-Z])");
+                foreach (var item in mapSplit)
+                {
+                    currentMap += $"{item} ";
+                }
+                if (currentMap == "Tutorial ")
+                {
+                    currentMap = "Monkey Meadow";
+                }
                 UpdateActivityFunction();
             }
         }
