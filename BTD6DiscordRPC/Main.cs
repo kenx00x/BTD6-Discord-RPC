@@ -1,11 +1,11 @@
-﻿using MelonLoader;
-using Discord;
-using Harmony;
+﻿using Assets.Scripts.Models.Profile;
 using Assets.Scripts.Simulation;
 using Assets.Scripts.Simulation.Utils;
-using Assets.Scripts.Models.Profile;
 using Assets.Scripts.Unity.Map;
 using Assets.Scripts.Unity.UI_New.Main;
+using Discord;
+using Harmony;
+using MelonLoader;
 
 [assembly: MelonInfo(typeof(BTD6DiscordRPC.Main), "BTD6 Discord RPC", "1.0.0", "kenx00x")]
 [assembly: MelonGame("Ninja Kiwi", "BloonsTD6")]
@@ -13,6 +13,7 @@ namespace BTD6DiscordRPC
 {
     public class Main : MelonMod
     {
+        public static int currentRound = 0;
         public static Discord.Discord discord;
         public override void OnApplicationStart()
         {
@@ -23,17 +24,18 @@ namespace BTD6DiscordRPC
         {
             discord.RunCallbacks();
         }
-        [HarmonyPatch(typeof(Simulation), "OnRoundEnd")]
+        [HarmonyPatch(typeof(Simulation), "OnRoundStart")]
         public class UpdateRound_Patch
         {
             [HarmonyPostfix]
-            public static void Postfix(int round)
+            public static void Postfix()
             {
+                currentRound++;
                 var activityManager = discord.GetActivityManager();
                 var activity = new Activity
                 {
                     Details = "Playing",
-                    State = $"Round {round+2}",
+                    State = $"Round {currentRound-1}",
                     Assets =
                     {
                         LargeImage = "mainimage",
@@ -49,11 +51,12 @@ namespace BTD6DiscordRPC
             [HarmonyPostfix]
             public static void Postfix(MapSaveDataModel mapData)
             {
+                currentRound = mapData.round;
                 var activityManager = discord.GetActivityManager();
                 var activity = new Activity
                 {
                     Details = "Playing",
-                    State = $"Round {mapData.round}",
+                    State = $"Round {currentRound}",
                     Assets =
                     {
                         LargeImage = "mainimage",
@@ -69,11 +72,12 @@ namespace BTD6DiscordRPC
             [HarmonyPostfix]
             public static void Postfix()
             {
+                currentRound = 1;
                 var activityManager = discord.GetActivityManager();
                 var activity = new Activity
                 {
                     Details = "Playing",
-                    State = "Round 1",
+                    State = $"Round {currentRound}",
                     Assets =
                     {
                         LargeImage = "mainimage",
@@ -99,12 +103,15 @@ namespace BTD6DiscordRPC
                         SmallImage = "mainimage"
                     }
                 };
-                activityManagerFunction(activity,activityManager);
+                activityManagerFunction(activity, activityManager);
             }
         }
+
+
         private static void activityManagerFunction(Activity activity, ActivityManager activityManager)
         {
-            activityManager.UpdateActivity(activity, (res) => {
+            activityManager.UpdateActivity(activity, (res) =>
+            {
                 if (res == Result.Ok)
                 {
                     MelonLogger.Log("Discord status updated");
