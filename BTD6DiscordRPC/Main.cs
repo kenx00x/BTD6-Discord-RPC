@@ -6,14 +6,14 @@ using Assets.Scripts.Unity.UI_New.Main;
 using Discord;
 using Harmony;
 using MelonLoader;
-
-[assembly: MelonInfo(typeof(BTD6DiscordRPC.Main), "BTD6 Discord RPC", "1.0.0", "kenx00x")]
+[assembly: MelonInfo(typeof(BTD6DiscordRPC.Main), "BTD6 Discord RPC", "1.1.0", "kenx00x")]
 [assembly: MelonGame("Ninja Kiwi", "BloonsTD6")]
 namespace BTD6DiscordRPC
 {
     public class Main : MelonMod
     {
         public static int currentRound = 0;
+        public static string currentMap = "";
         public static Discord.Discord discord;
         public override void OnApplicationStart()
         {
@@ -30,19 +30,8 @@ namespace BTD6DiscordRPC
             [HarmonyPostfix]
             public static void Postfix()
             {
+                UpdateActivityFunction();
                 currentRound++;
-                var activityManager = discord.GetActivityManager();
-                var activity = new Activity
-                {
-                    Details = "Playing",
-                    State = $"Round {currentRound - 1}",
-                    Assets =
-                    {
-                        LargeImage = "mainimage",
-                        SmallImage = "mainimage"
-                    }
-                };
-                ActivityManagerFunction(activity, activityManager);
             }
         }
         [HarmonyPatch(typeof(MapSaveLoader), "LoadMapSaveData")]
@@ -52,39 +41,18 @@ namespace BTD6DiscordRPC
             public static void Postfix(MapSaveDataModel mapData)
             {
                 currentRound = mapData.round;
-                var activityManager = discord.GetActivityManager();
-                var activity = new Activity
-                {
-                    Details = "Playing",
-                    State = $"Round {currentRound}",
-                    Assets =
-                    {
-                        LargeImage = "mainimage",
-                        SmallImage = "mainimage"
-                    }
-                };
-                ActivityManagerFunction(activity, activityManager);
+                UpdateActivityFunction();
             }
         }
         [HarmonyPatch(typeof(MapLoader), "Load")]
         public class MapLoader_Patch
         {
             [HarmonyPostfix]
-            public static void Postfix()
+            public static void Postfix(string map)
             {
                 currentRound = 1;
-                var activityManager = discord.GetActivityManager();
-                var activity = new Activity
-                {
-                    Details = "Playing",
-                    State = $"Round {currentRound}",
-                    Assets =
-                    {
-                        LargeImage = "mainimage",
-                        SmallImage = "mainimage"
-                    }
-                };
-                ActivityManagerFunction(activity, activityManager);
+                currentMap = map;
+                UpdateActivityFunction();
             }
         }
         [HarmonyPatch(typeof(MainMenu), "Open")]
@@ -106,8 +74,6 @@ namespace BTD6DiscordRPC
                 ActivityManagerFunction(activity, activityManager);
             }
         }
-
-
         private static void ActivityManagerFunction(Activity activity, ActivityManager activityManager)
         {
             activityManager.UpdateActivity(activity, (res) =>
@@ -121,6 +87,21 @@ namespace BTD6DiscordRPC
                     MelonLogger.Log("Discord status not updated");
                 }
             });
+        }
+        private static void UpdateActivityFunction()
+        {
+            var activityManager = discord.GetActivityManager();
+            var activity = new Activity
+            {
+                Details = currentMap,
+                State = $"Round {currentRound}",
+                Assets =
+                    {
+                        LargeImage = "mainimage",
+                        SmallImage = "mainimage"
+                    }
+            };
+            ActivityManagerFunction(activity, activityManager);
         }
     }
 }
