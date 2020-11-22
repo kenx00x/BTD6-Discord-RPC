@@ -2,12 +2,13 @@
 using Assets.Scripts.Simulation;
 using Assets.Scripts.Simulation.Utils;
 using Assets.Scripts.Unity.Map;
+using Assets.Scripts.Unity.UI_New.GameOver;
 using Assets.Scripts.Unity.UI_New.Main;
 using Discord;
 using Harmony;
 using MelonLoader;
 using System.Text.RegularExpressions;
-[assembly: MelonInfo(typeof(BTD6DiscordRPC.Main), "BTD6 Discord RPC", "1.1.0", "kenx00x")]
+[assembly: MelonInfo(typeof(BTD6DiscordRPC.Main), "BTD6 Discord RPC", "1.1.1", "kenx00x")]
 [assembly: MelonGame("Ninja Kiwi", "BloonsTD6")]
 namespace BTD6DiscordRPC
 {
@@ -33,6 +34,15 @@ namespace BTD6DiscordRPC
             {
                 UpdateActivityFunction();
                 currentRound++;
+            }
+        }
+        [HarmonyPatch(typeof(DefeatScreen), "RunContinue")]
+        public class Defeat_Patch
+        {
+            [HarmonyPostfix]
+            public static void Postfix()
+            {
+                currentRound--;
             }
         }
         [HarmonyPatch(typeof(MapSaveLoader), "LoadMapSaveData")]
