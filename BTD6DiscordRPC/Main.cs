@@ -8,7 +8,6 @@ using Harmony;
 using MelonLoader;
 using System.Text.RegularExpressions;
 using UnityEngine;
-
 [assembly: MelonInfo(typeof(BTD6DiscordRPC.Main), "BTD6 Discord RPC", "2.2.0", "kenx00x, rambini")]
 [assembly: MelonGame("Ninja Kiwi", "BloonsTD6")]
 namespace BTD6DiscordRPC
