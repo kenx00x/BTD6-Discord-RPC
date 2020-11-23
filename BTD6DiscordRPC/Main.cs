@@ -1,16 +1,20 @@
-﻿using Assets.Scripts.Unity.Map;
+﻿using Assets.Scripts.Models;
+using Assets.Scripts.Simulation;
+using Assets.Scripts.Unity.Map;
 using Assets.Scripts.Unity.UI_New.InGame.Stats;
 using Assets.Scripts.Unity.UI_New.Main;
 using Discord;
 using Harmony;
 using MelonLoader;
 using System.Text.RegularExpressions;
-[assembly: MelonInfo(typeof(BTD6DiscordRPC.Main), "BTD6 Discord RPC", "2.0.2", "kenx00x")]
+[assembly: MelonInfo(typeof(BTD6DiscordRPC.Main), "BTD6 Discord RPC", "2.1.0", "kenx00x")]
 [assembly: MelonGame("Ninja Kiwi", "BloonsTD6")]
 namespace BTD6DiscordRPC
 {
     public class Main : MelonMod
     {
+        public static string mode = "";
+        public static string difficulty = "";
         public static string round = "";
         public static string currentMap = "";
         public static Discord.Discord discord;
@@ -53,9 +57,38 @@ namespace BTD6DiscordRPC
             [HarmonyPostfix]
             public static void Postfix()
             {
+                difficulty = "";
+                mode = "";
                 currentMap = "Main menu";
                 round = "";
                 UpdateActivityFunction();
+            }
+        }
+        [HarmonyPatch(typeof(Simulation), "InitialiseDifficulty")]
+        public class UnityToSimulation_Patch
+        {
+            [HarmonyPostfix]
+            public static void Postfix(string newDifficulty)
+            {
+                difficulty = $"{newDifficulty} Difficulty - ";
+            }
+        }
+        [HarmonyPatch(typeof(Simulation), "Initialise")]
+        public class Simulation_Patch
+        {
+            [HarmonyPostfix]
+            public static void Postfix(GameModel model)
+            {
+                mode = "";
+                string[] gameModeSplit = Regex.Split(model.gameMode, @"(?<!^)(?=[A-Z])");
+                foreach (var item in gameModeSplit)
+                {
+                    mode += $"{item} ";
+                }
+                if (mode == "Clicks ")
+                {
+                    mode = "Chimps";
+                }
             }
         }
         private static void UpdateActivityFunction()
@@ -66,10 +99,10 @@ namespace BTD6DiscordRPC
                 Details = currentMap,
                 State = round,
                 Assets =
-                    {
-                        LargeImage = "mainimage",
-                        SmallImage = "mainimage",
-                    }
+                {
+                    LargeImage = "mainimage",
+                    LargeText = $"{difficulty}{mode}"
+                }
             };
             activityManager.UpdateActivity(activity, (res) => { });
         }
