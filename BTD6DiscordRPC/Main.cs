@@ -5,7 +5,7 @@ using Discord;
 using Harmony;
 using MelonLoader;
 using System.Text.RegularExpressions;
-[assembly: MelonInfo(typeof(BTD6DiscordRPC.Main), "BTD6 Discord RPC", "2.0.0", "kenx00x")]
+[assembly: MelonInfo(typeof(BTD6DiscordRPC.Main), "BTD6 Discord RPC", "2.0.1", "kenx00x")]
 [assembly: MelonGame("Ninja Kiwi", "BloonsTD6")]
 namespace BTD6DiscordRPC
 {
@@ -68,13 +68,10 @@ namespace BTD6DiscordRPC
                 Assets =
                     {
                         LargeImage = "mainimage",
-                        SmallImage = "mainimage"
+                        SmallImage = "mainimage",
                     }
             };
-            activityManager.UpdateActivity(activity, (res) =>
-            {
-                if (res == Result.Ok) ;
-            });
+            activityManager.UpdateActivity(activity, (res) => { });
         }
     }
 }
