@@ -7,12 +7,19 @@ using Discord;
 using Harmony;
 using MelonLoader;
 using System.Text.RegularExpressions;
-[assembly: MelonInfo(typeof(BTD6DiscordRPC.Main), "BTD6 Discord RPC", "2.1.0", "kenx00x")]
+using UnityEngine;
+
+[assembly: MelonInfo(typeof(BTD6DiscordRPC.Main), "BTD6 Discord RPC", "2.2.0", "kenx00x, rambini")]
 [assembly: MelonGame("Ninja Kiwi", "BloonsTD6")]
 namespace BTD6DiscordRPC
 {
     public class Main : MelonMod
     {
+        public static string cashMoneyText = "";
+        public static string cashMoneyIcon = "";
+        public static string shield = "";
+        public static string health = "";
+        public static string money = "";
         public static string mode = "";
         public static string difficulty = "";
         public static string round = "";
@@ -25,10 +32,46 @@ namespace BTD6DiscordRPC
         }
         public override void OnUpdate()
         {
-            RoundDisplay[] CurrentRoundUI = UnityEngine.Object.FindObjectsOfType<RoundDisplay>();
+            HealthDisplay[] CurrentHealthUI = Object.FindObjectsOfType<HealthDisplay>();
+            foreach (var item in CurrentHealthUI)
+            {
+                health = $"Health: {item.text.m_text}";
+            }
+            RoundDisplay[] CurrentRoundUI = Object.FindObjectsOfType<RoundDisplay>();
             foreach (var item in CurrentRoundUI)
             {
-                round = $"Round {item.text.m_text}";
+                round = $"Round: {item.text.m_text}";
+            }
+            CashDisplay[] CurrentMoneyUI = Object.FindObjectsOfType<CashDisplay>();
+            foreach (var item in CurrentMoneyUI)
+            {
+                money = $"Money: {item.text.m_text}";
+            }
+            bool hasShield = false;
+            RectTransform[] hideMe = Object.FindObjectsOfType<RectTransform>();
+            foreach (var item in hideMe)
+            {
+                if (item.name == "HideMe")
+                {
+                    hasShield = true;
+                }
+            }
+            if (hasShield)
+            {
+                ShieldDisplay[] CurrentShieldUI = Object.FindObjectsOfType<ShieldDisplay>();
+                foreach (var item in CurrentShieldUI)
+                {
+                    shield = $"Shield: {item.text.m_text}";
+                }
+            }
+            else
+            {
+                shield = "";
+            }
+            if (health != "")
+            {
+                cashMoneyIcon = "cashmoney";
+                cashMoneyText = $"{health} {shield} {money}";
             }
             UpdateActivityFunction();
             discord.RunCallbacks();
@@ -57,10 +100,15 @@ namespace BTD6DiscordRPC
             [HarmonyPostfix]
             public static void Postfix()
             {
+                shield = "";
+                cashMoneyText = "";
+                health = "";
+                money = "";
                 difficulty = "";
                 mode = "";
                 currentMap = "Main menu";
                 round = "";
+                cashMoneyIcon = "";
                 UpdateActivityFunction();
             }
         }
@@ -101,7 +149,9 @@ namespace BTD6DiscordRPC
                 Assets =
                 {
                     LargeImage = "mainimage",
-                    LargeText = $"{difficulty}{mode}"
+                    LargeText = $"{difficulty}{mode}",
+                    SmallImage = cashMoneyIcon,
+                    SmallText = cashMoneyText
                 }
             };
             activityManager.UpdateActivity(activity, (res) => { });
